@@ -1,0 +1,17 @@
+{
+  "name": "windsurf-project",
+  "private": true,
+  "workspaces": [
+    "ui",
+    "ui/packages/*"
+  ],
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "turbo run start"
+  },
+  "devDependencies": {
+    "turbo": "^1.10.14"
+  }
+}

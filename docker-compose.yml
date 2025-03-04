@@ -1,0 +1,151 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: trading
+      POSTGRES_PASSWORD: trading
+      POSTGRES_DB: trading_system
+      # Create a test database as well
+      POSTGRES_MULTIPLE_DATABASES: trading_test
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Add script to create multiple databases
+      - ./scripts/create-multiple-postgresql-databases.sh:/docker-entrypoint-initdb.d/create-multiple-postgresql-databases.sh
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U trading"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+  api:
+    build:
+      context: .
+      dockerfile: services/api/Dockerfile
+      args:
+        - PYTHON_VERSION=3.11
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgresql://trading:trading@postgres:5432/trading_system
+      - JWT_SECRET=your-secret-key
+      - ENVIRONMENT=development
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./src:/app/src
+
+  market_simulator:
+    build:
+      context: .
+      dockerfile: services/market_simulator/Dockerfile
+      args:
+        - PYTHON_VERSION=3.11
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - SIMULATION_INTERVAL=1
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  celery_worker:
+    build:
+      context: .
+      dockerfile: services/worker/Dockerfile
+      args:
+        - PYTHON_VERSION=3.11
+    command: celery -A worker.tasks worker --loglevel=debug
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgresql://trading:trading@postgres:5432/trading_system
+      - C_FORCE_ROOT=true
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./src:/app/src
+      - ./services/worker:/app/worker
+    restart: unless-stopped
+
+  celery_beat:
+    build:
+      context: .
+      dockerfile: services/worker/Dockerfile
+      args:
+        - PYTHON_VERSION=3.11
+    command: celery -A worker.tasks beat --loglevel=debug
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgresql://trading:trading@postgres:5432/trading_system
+    depends_on:
+      - celery_worker
+    volumes:
+      - ./src:/app/src
+      - ./services/worker:/app/worker
+    restart: unless-stopped
+
+  migrate:
+    build:
+      context: .
+      dockerfile: services/api/Dockerfile
+      args:
+        - PYTHON_VERSION=3.11
+    command: ./scripts/migrate.sh
+    environment:
+      - DATABASE_URL=postgresql://trading:trading@postgres:5432/trading_system
+      - POSTGRES_USER=trading
+      - POSTGRES_PASSWORD=trading
+      - POSTGRES_DB=trading_system
+    volumes:
+      - ./migrations:/app/migrations
+      - ./alembic.ini:/app/alembic.ini
+      - ./scripts:/app/scripts
+      - ./src:/app/src
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  test:
+    build:
+      context: .
+      dockerfile: services/api/Dockerfile.test
+      args:
+        - PYTHON_VERSION=3.11
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgresql://trading:trading@postgres:5432/trading_system
+      - ENVIRONMENT=test
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./src:/app/src
+      - ./tests:/app/tests
+      - ./services:/app/services
+      - ./pytest.ini:/app/pytest.ini
+
+volumes:
+  redis_data:
+  postgres_data:
