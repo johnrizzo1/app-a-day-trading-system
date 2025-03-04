@@ -2,7 +2,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from typing import List
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 from ..database import get_db
 from ...database.models import Strategy, Model
@@ -22,8 +22,7 @@ class StrategyResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 @router.post("/", response_model=StrategyResponse)
 async def create_strategy(strategy: StrategyCreate, db: Session = Depends(get_db)):

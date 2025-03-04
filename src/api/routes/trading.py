@@ -2,35 +2,96 @@
 from fastapi import APIRouter, HTTPException, Depends, WebSocket
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator, ConfigDict
 from datetime import datetime
 import json
 import redis
 from ..database import get_db
-from ...database.models import Order, OrderType, OrderSide, OrderStatus, Position, FuturesContract
+# Direct import from models.py to avoid circular imports
+import importlib.util
+import os
+
+# Directly import the models.py file
+models_path = os.path.join(os.path.dirname(__file__), '..', '..', 'database', 'models.py')
+spec = importlib.util.spec_from_file_location('models_module', models_path)
+models_module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(models_module)
+
+# Get the models from the imported module
+Order = models_module.Order
+OrderType = models_module.OrderType
+OrderSide = models_module.OrderSide
+OrderStatus = models_module.OrderStatus
+Position = models_module.Position
+FuturesContract = models_module.FuturesContract
 
 router = APIRouter(prefix="/api/trading", tags=["trading"])
 
+class ContractCreate(BaseModel):
+    symbol: str
+    expiry: datetime
+    tick_size: float
+    contract_size: float
+    margin_requirement: float
+
 class OrderCreate(BaseModel):
     contract_id: int
-    order_type: OrderType
+    type: OrderType
     side: OrderSide
     quantity: float
     price: Optional[float] = None
+    # These are required by the database schema but we'll set default values
+    account_id: int = 1  # Default account
+    instrument_id: int = 1  # Default instrument
+    
+    # Add validators to handle both uppercase and lowercase enum values
+    @field_validator('type', mode='before')
+    @classmethod
+    def validate_type(cls, v):
+        if isinstance(v, str):
+            try:
+                return OrderType[v.upper()]
+            except KeyError:
+                pass
+        return v
+    
+    @field_validator('side', mode='before')
+    @classmethod
+    def validate_side(cls, v):
+        if isinstance(v, str):
+            try:
+                return OrderSide[v.upper()]
+            except KeyError:
+                pass
+        return v
 
 class OrderResponse(BaseModel):
     id: int
     contract_id: int
-    order_type: OrderType
+    type: OrderType
     side: OrderSide
     quantity: float
     price: Optional[float]
     status: OrderStatus
     created_at: datetime
     updated_at: datetime
+    account_id: int
+    instrument_id: int
+    filled_quantity: Optional[float]
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
+
+class ContractResponse(BaseModel):
+    id: int
+    symbol: str
+    expiry: datetime
+    tick_size: float
+    contract_size: float
+    margin_requirement: float
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
 
 class PositionResponse(BaseModel):
     id: int
@@ -42,8 +103,31 @@ class PositionResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
+
+@router.post("/contracts", response_model=ContractResponse)
+async def create_contract(contract: ContractCreate, db: Session = Depends(get_db)):
+    # Check if contract with same symbol already exists
+    existing_contract = db.query(FuturesContract).filter(FuturesContract.symbol == contract.symbol).first()
+    if existing_contract:
+        raise HTTPException(status_code=400, detail="Contract with this symbol already exists")
+    
+    # Create the contract
+    db_contract = FuturesContract(
+        symbol=contract.symbol,
+        expiry=contract.expiry,
+        tick_size=contract.tick_size,
+        contract_size=contract.contract_size,
+        margin_requirement=contract.margin_requirement
+    )
+    db.add(db_contract)
+    try:
+        db.commit()
+        db.refresh(db_contract)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(e))
+    return db_contract
 
 @router.post("/orders", response_model=OrderResponse)
 async def create_order(order: OrderCreate, db: Session = Depends(get_db)):
@@ -53,10 +137,20 @@ async def create_order(order: OrderCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Contract not found")
     
     # Validate order
-    if order.order_type != OrderType.MARKET and not order.price:
+    if order.type != OrderType.MARKET and not order.price:
         raise HTTPException(status_code=400, detail="Price required for limit/stop orders")
     
-    db_order = Order(**order.dict())
+    # Create the order
+    db_order = Order(
+        contract_id=order.contract_id,
+        type=order.type,
+        side=order.side,
+        quantity=order.quantity,
+        price=order.price,
+        account_id=order.account_id,
+        instrument_id=order.instrument_id,
+        status=OrderStatus.PENDING
+    )
     db.add(db_order)
     try:
         db.commit()

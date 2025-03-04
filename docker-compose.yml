@@ -1,4 +1,22 @@
 services:
+  ui:
+    build:
+      context: .
+      dockerfile: ui/Dockerfile
+    ports:
+      - "4000:3005"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://api:8000
+    volumes:
+      - ./ui/packages/trading:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
   redis:
     image: redis:7-alpine
     ports:
@@ -51,6 +69,12 @@ services:
         condition: service_healthy
     volumes:
       - ./src:/app/src
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   market_simulator:
     build:

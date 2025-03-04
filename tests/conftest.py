@@ -26,6 +26,8 @@ Backtest = models_module.Backtest
 FuturesContract = models_module.FuturesContract
 Position = models_module.Position
 Order = models_module.Order
+Account = models_module.Account
+Instrument = models_module.Instrument
 
 # Make them available to all test modules
 pytest.Base = Base
@@ -35,3 +37,5 @@ pytest.Backtest = Backtest
 pytest.FuturesContract = FuturesContract
 pytest.Position = Position
 pytest.Order = Order
+pytest.Account = Account
+pytest.Instrument = Instrument

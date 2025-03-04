@@ -2,7 +2,7 @@
 from fastapi import APIRouter, HTTPException, Depends, WebSocket
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 import redis
 from ..database import get_db
@@ -19,8 +19,7 @@ class InstrumentResponse(BaseModel):
     symbol: str
     name: str
     
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 class EquityResponse(InstrumentResponse):
     exchange: str

@@ -2,7 +2,7 @@
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 from ..database import get_db
 from ...database.models import Backtest, Strategy
@@ -25,8 +25,7 @@ class BacktestResponse(BaseModel):
     metrics: Optional[dict]
     created_at: datetime
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 @router.post("/", response_model=BacktestResponse)
 async def create_backtest(

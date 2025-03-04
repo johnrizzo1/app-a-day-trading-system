@@ -26,7 +26,13 @@ FuturesContract = models_module.FuturesContract
 Position = models_module.Position
 OrderModel = models_module.Order
 
+# Import routers
+from src.api.routes import trading
+
 app = FastAPI(title="Trading System API")
+
+# Include routers
+app.include_router(trading.router)
 
 # Pydantic models for request validation
 class ModelCreate(BaseModel):
@@ -52,12 +58,7 @@ class FuturesContractCreate(BaseModel):
     contract_size: float
     margin_requirement: float
 
-class OrderCreate(BaseModel):
-    contract_id: int
-    order_type: str
-    side: str
-    quantity: float
-    price: Optional[float] = None
+# OrderCreate model moved to trading.py
 
 @app.get("/")
 async def root():
@@ -134,24 +135,7 @@ async def create_contract(contract: FuturesContractCreate, db: Session = Depends
         db.rollback()
         raise HTTPException(status_code=400, detail=str(e))
 
-@app.post("/api/trading/orders")
-async def create_order(order: OrderCreate, db: Session = Depends(get_db)):
-    """Create a new order."""
-    try:
-        db_order = OrderModel(
-            contract_id=order.contract_id,
-            order_type=order.order_type,
-            side=order.side,
-            quantity=order.quantity,
-            price=order.price
-        )
-        db.add(db_order)
-        db.commit()
-        db.refresh(db_order)
-        return db_order
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=400, detail=str(e))
+# Order creation endpoint moved to trading.py
 
 @app.get("/api/trading/positions")
 async def get_positions(db: Session = Depends(get_db)):
