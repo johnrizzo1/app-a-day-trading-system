@@ -2,17 +2,25 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Install Next.js globally
-RUN npm install -g next
+# Create workspace structure
+RUN mkdir -p /app/packages/portfolio-monitor /app/packages/shared
 
-# Copy package.json files
-COPY ui/packages/portfolio-monitor/package*.json ./
+# Copy shared package first
+COPY ui/packages/shared/package*.json /app/packages/shared/
+COPY ui/packages/shared /app/packages/shared/
+
+# Copy portfolio-monitor package
+COPY ui/packages/portfolio-monitor/package*.json /app/packages/portfolio-monitor/
+
+# Set up workspace
+COPY ui/package.json /app/
 
 # Install dependencies
+WORKDIR /app/packages/portfolio-monitor
 RUN npm install
 
 # Copy the rest of the application
-COPY ui/packages/portfolio-monitor/ ./
+COPY ui/packages/portfolio-monitor/ /app/packages/portfolio-monitor/
 
 # Expose the port
 EXPOSE 3003
@@ -20,6 +28,7 @@ EXPOSE 3003
 # Set environment variables
 ENV PORT=3003
 ENV NEXT_PUBLIC_BASE_PATH=/portfolio-monitor
+ENV NODE_PATH=/app/packages
 
-# Start the development server
-CMD ["next", "dev", "-p", "3003"]
+# Start the application
+CMD ["npm", "run", "dev"]

@@ -2,17 +2,25 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Install Next.js globally
-RUN npm install -g next
+# Create workspace structure
+RUN mkdir -p /app/packages/backtesting /app/packages/shared
 
-# Copy package.json files
-COPY ui/packages/backtesting/package*.json ./
+# Copy shared package first
+COPY ui/packages/shared/package*.json /app/packages/shared/
+COPY ui/packages/shared /app/packages/shared/
+
+# Copy backtesting package
+COPY ui/packages/backtesting/package*.json /app/packages/backtesting/
+
+# Set up workspace
+COPY ui/package.json /app/
 
 # Install dependencies
+WORKDIR /app/packages/backtesting
 RUN npm install
 
 # Copy the rest of the application
-COPY ui/packages/backtesting/ ./
+COPY ui/packages/backtesting/ /app/packages/backtesting/
 
 # Expose the port
 EXPOSE 3001
@@ -20,6 +28,7 @@ EXPOSE 3001
 # Set environment variables
 ENV PORT=3001
 ENV NEXT_PUBLIC_BASE_PATH=/backtesting
+ENV NODE_PATH=/app/packages
 
-# Start the development server
-CMD ["next", "dev", "-p", "3001"]
+# Start the application
+CMD ["npm", "run", "dev"]

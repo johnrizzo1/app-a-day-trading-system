@@ -1,32 +1,22 @@
 import React, { ReactNode } from 'react';
-import { Container, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import NavBar from './NavBar';
 
 interface LayoutProps {
   children: ReactNode;
 }
 
-// Create a theme instance
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#1976d2',
-    },
-    secondary: {
-      main: '#dc004e',
-    },
-  },
-});
-
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
+    <div>
       <NavBar />
-      <Container maxWidth="xl">
+      <div style={{ 
+        maxWidth: '1200px', 
+        margin: '0 auto', 
+        padding: '0 16px' 
+      }}>
         {children}
-      </Container>
-    </ThemeProvider>
+      </div>
+    </div>
   );
 };
 

@@ -2,17 +2,25 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Install Next.js globally
-RUN npm install -g next
+# Create workspace structure
+RUN mkdir -p /app/packages/strategy-development /app/packages/shared
 
-# Copy package.json files
-COPY ui/packages/strategy-development/package*.json ./
+# Copy shared package first
+COPY ui/packages/shared/package*.json /app/packages/shared/
+COPY ui/packages/shared /app/packages/shared/
+
+# Copy strategy-development package
+COPY ui/packages/strategy-development/package*.json /app/packages/strategy-development/
+
+# Set up workspace
+COPY ui/package.json /app/
 
 # Install dependencies
+WORKDIR /app/packages/strategy-development
 RUN npm install
 
 # Copy the rest of the application
-COPY ui/packages/strategy-development/ ./
+COPY ui/packages/strategy-development/ /app/packages/strategy-development/
 
 # Expose the port
 EXPOSE 3004
@@ -20,6 +28,7 @@ EXPOSE 3004
 # Set environment variables
 ENV PORT=3004
 ENV NEXT_PUBLIC_BASE_PATH=/strategy-development
+ENV NODE_PATH=/app/packages
 
-# Start the development server
-CMD ["next", "dev", "-p", "3004"]
+# Start the application
+CMD ["npm", "run", "dev"]

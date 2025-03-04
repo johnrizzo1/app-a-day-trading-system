@@ -16,9 +16,6 @@ const ModelDevelopment: React.FC = () => {
 
   return (
     <Box p={3}>
-      <Typography variant="h4" gutterBottom>
-        Model Development Dashboard
-      </Typography>
       
       <Grid container spacing={3}>
         <Grid item xs={12} md={4}>

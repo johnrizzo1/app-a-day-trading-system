@@ -32,9 +32,6 @@ const PortfolioMonitor: React.FC = () => {
 
   return (
     <Box p={3}>
-      <Typography variant="h4" gutterBottom>
-        Portfolio Monitor
-      </Typography>
       
       <Grid container spacing={3}>
         <Grid item xs={12} md={8}>

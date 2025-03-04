@@ -1,14 +1,4 @@
 import React from 'react';
-import { 
-  AppBar, 
-  Toolbar, 
-  Typography, 
-  Button, 
-  Box,
-  Container,
-  createTheme
-} from '@mui/material';
-import Link from 'next/link';
 
 // Define the navigation items with updated paths for the API gateway
 const navItems = [
@@ -19,16 +9,6 @@ const navItems = [
   { name: 'Strategy Development', path: '/strategy-development' }
 ];
 
-// Create a theme instance for use in static methods
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#1976d2',
-      dark: '#115293',
-    },
-  },
-});
-
 const NavBar: React.FC = () => {
   // Helper function to determine if a nav item is active
   const isActive = (path: string) => {
@@ -38,41 +18,46 @@ const NavBar: React.FC = () => {
   };
 
   return (
-    <AppBar position="static" sx={{ marginBottom: 2 }}>
-      <Container maxWidth="xl">
-        <Toolbar disableGutters>
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
-          >
-            WINDSURF
-          </Typography>
+    <nav style={{ 
+      backgroundColor: '#1976d2', 
+      marginBottom: '16px',
+      padding: '0 16px'
+    }}>
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center',
+        maxWidth: '1200px',
+        margin: '0 auto',
+        padding: '8px 0'
+      }}>
+        <div style={{ 
+          marginRight: '16px', 
+          color: 'white', 
+          fontWeight: 'bold',
+          fontSize: '1.25rem'
+        }}>
+          WINDSURF
+        </div>
 
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {navItems.map((item) => (
-              <Button
-                key={item.name}
-                component="a"
-                href={item.path}
-                sx={{
-                  my: 2, 
-                  color: 'white', 
-                  display: 'block',
-                  backgroundColor: isActive(item.path) ? theme.palette.primary.dark : 'transparent',
-                  '&:hover': {
-                    backgroundColor: theme.palette.primary.dark,
-                  }
-                }}
-              >
-                {item.name}
-              </Button>
-            ))}
-          </Box>
-        </Toolbar>
-      </Container>
-    </AppBar>
+        <div style={{ display: 'flex', flexGrow: 1 }}>
+          {navItems.map((item) => (
+            <a
+              key={item.name}
+              href={item.path}
+              style={{
+                margin: '8px 16px 8px 0', 
+                color: 'white', 
+                textDecoration: 'none',
+                padding: '8px 16px',
+                backgroundColor: isActive(item.path) ? '#115293' : 'transparent',
+              }}
+            >
+              {item.name}
+            </a>
+          ))}
+        </div>
+      </div>
+    </nav>
   );
 };
 
