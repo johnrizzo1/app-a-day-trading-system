@@ -5,7 +5,7 @@ This file helps avoid circular imports by providing a single import point.
 # Import from models.py
 from src.database.models import (
     Base, 
-    Model, 
+    FinancialModel, 
     Strategy, 
     Backtest, 
     FuturesContract, 
@@ -20,7 +20,7 @@ from src.database.models import (
 # Make all these available for import from this module
 __all__ = [
     'Base', 
-    'Model', 
+    'FinancialModel', 
     'Strategy', 
     'Backtest', 
     'FuturesContract', 

@@ -19,7 +19,7 @@ spec.loader.exec_module(models_module)
 
 # Get the models from the imported module
 Base = models_module.Base
-Model = models_module.Model
+FinancialModel = models_module.FinancialModel
 Strategy = models_module.Strategy
 Backtest = models_module.Backtest
 FuturesContract = models_module.FuturesContract
@@ -68,7 +68,7 @@ async def root():
 async def create_model(model: ModelCreate, db: Session = Depends(get_db)):
     """Create a new model."""
     try:
-        db_model = Model(
+        db_model = FinancialModel(
             name=model.name,
             description=model.description,
             parameters=model.parameters

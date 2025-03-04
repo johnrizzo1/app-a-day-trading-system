@@ -5,7 +5,7 @@ from typing import List
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 from ..database import get_db
-from ...database.models import Strategy, Model
+from ...database.models import Strategy, FinancialModel
 
 router = APIRouter(prefix="/api/strategies", tags=["strategies"])
 
@@ -27,7 +27,7 @@ class StrategyResponse(BaseModel):
 @router.post("/", response_model=StrategyResponse)
 async def create_strategy(strategy: StrategyCreate, db: Session = Depends(get_db)):
     # Verify model exists
-    model = db.query(Model).filter(Model.id == strategy.model_id).first()
+    model = db.query(FinancialModel).filter(FinancialModel.id == strategy.model_id).first()
     if not model:
         raise HTTPException(status_code=404, detail="Model not found")
     
@@ -62,7 +62,7 @@ async def update_strategy(
     
     # Verify model exists if model_id is being updated
     if strategy_update.model_id != strategy.model_id:
-        model = db.query(Model).filter(Model.id == strategy_update.model_id).first()
+        model = db.query(FinancialModel).filter(FinancialModel.id == strategy_update.model_id).first()
         if not model:
             raise HTTPException(status_code=404, detail="Model not found")
     

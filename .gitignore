@@ -39,6 +39,7 @@ ENV/
 
 # Test coverage
 .coverage
+.pytest_cache/
 htmlcov/
 
 # Node

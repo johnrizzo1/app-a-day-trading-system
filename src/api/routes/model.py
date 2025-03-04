@@ -5,7 +5,7 @@ from typing import List
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 from ..database import get_db
-from ...database.models import Model, ModelStatus
+from ...database.models import FinancialModel, ModelStatus
 
 router = APIRouter(prefix="/api/models", tags=["models"])
 
@@ -27,7 +27,7 @@ class ModelResponse(BaseModel):
 
 @router.post("/", response_model=ModelResponse)
 async def create_model(model: ModelCreate, db: Session = Depends(get_db)):
-    db_model = Model(**model.dict())
+    db_model = FinancialModel(**model.dict())
     db.add(db_model)
     try:
         db.commit()
@@ -39,18 +39,18 @@ async def create_model(model: ModelCreate, db: Session = Depends(get_db)):
 
 @router.get("/", response_model=List[ModelResponse])
 async def list_models(db: Session = Depends(get_db)):
-    return db.query(Model).all()
+    return db.query(FinancialModel).all()
 
 @router.get("/{model_id}", response_model=ModelResponse)
 async def get_model(model_id: int, db: Session = Depends(get_db)):
-    model = db.query(Model).filter(Model.id == model_id).first()
+    model = db.query(FinancialModel).filter(FinancialModel.id == model_id).first()
     if not model:
         raise HTTPException(status_code=404, detail="Model not found")
     return model
 
 @router.put("/{model_id}", response_model=ModelResponse)
 async def update_model(model_id: int, model_update: ModelCreate, db: Session = Depends(get_db)):
-    model = db.query(Model).filter(Model.id == model_id).first()
+    model = db.query(FinancialModel).filter(FinancialModel.id == model_id).first()
     if not model:
         raise HTTPException(status_code=404, detail="Model not found")
     

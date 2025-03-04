@@ -4,8 +4,8 @@ import os
 import pytest
 import pytest_asyncio
 
-# Configure pytest-asyncio to use function scope for event loops
-pytest_asyncio.plugin.pytest_configure(None)
+# Configure pytest-asyncio using the proper method
+# This will be handled by pytest.ini or pyproject.toml
 
 # Add the project root directory to the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -24,7 +24,7 @@ spec.loader.exec_module(models_module)
 
 # Get the models from the imported module
 Base = models_module.Base
-Model = models_module.Model
+FinancialModel = models_module.FinancialModel
 Strategy = models_module.Strategy
 Backtest = models_module.Backtest
 FuturesContract = models_module.FuturesContract
@@ -35,7 +35,7 @@ Instrument = models_module.Instrument
 
 # Make them available to all test modules
 pytest.Base = Base
-pytest.Model = Model
+pytest.FinancialModel = FinancialModel
 pytest.Strategy = Strategy
 pytest.Backtest = Backtest
 pytest.FuturesContract = FuturesContract

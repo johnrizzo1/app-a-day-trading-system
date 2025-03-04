@@ -245,13 +245,14 @@ services:
   test:
     build:
       context: .
-      dockerfile: services/api/Dockerfile.test
+      dockerfile: tests/docker/Dockerfile
       args:
         - PYTHON_VERSION=3.11
     environment:
       - REDIS_URL=redis://redis:6379
       - DATABASE_URL=postgresql://trading:trading@postgres:5432/trading_system
       - ENVIRONMENT=test
+      - NODE_ENV=test
     depends_on:
       redis:
         condition: service_healthy
@@ -262,6 +263,7 @@ services:
       - ./tests:/app/tests
       - ./services:/app/services
       - ./pytest.ini:/app/pytest.ini
+      - ./ui:/app/ui
 
 volumes:
   redis_data:

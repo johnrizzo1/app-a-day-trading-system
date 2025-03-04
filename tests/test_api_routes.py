@@ -16,7 +16,7 @@ from src.api.main import app
 
 # Get models from pytest fixtures (defined in conftest.py)
 Base = pytest.Base
-Model = pytest.Model
+FinancialModel = pytest.FinancialModel
 Strategy = pytest.Strategy
 Backtest = pytest.Backtest
 FuturesContract = pytest.FuturesContract

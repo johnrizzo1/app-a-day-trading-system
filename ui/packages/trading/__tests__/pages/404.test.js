@@ -21,8 +21,9 @@ describe('404 Page', () => {
     render(<Custom404 />);
     const homeLink = screen.getByText('Return to Home');
     expect(homeLink).toBeInTheDocument();
-    expect(homeLink.tagName).toBe('A');
-    expect(homeLink).toHaveAttribute('href', '/');
+    // In Next.js Link implementation, it's actually a div inside an anchor
+    const linkContainer = homeLink.closest('a');
+    expect(linkContainer).toHaveAttribute('href', '/');
   });
 
   it('has the correct styling', () => {

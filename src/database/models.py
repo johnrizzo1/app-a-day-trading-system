@@ -28,7 +28,7 @@ class OrderStatus(enum.Enum):
     CANCELLED = "cancelled"
     REJECTED = "rejected"
 
-class Model(Base):
+class FinancialModel(Base):
     __tablename__ = "models"
     
     id = Column(Integer, primary_key=True)
@@ -51,7 +51,7 @@ class Strategy(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    model = relationship("Model", back_populates="strategies")
+    model = relationship("FinancialModel", back_populates="strategies")
     backtests = relationship("Backtest", back_populates="strategy")
 
 class Backtest(Base):
