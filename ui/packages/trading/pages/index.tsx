@@ -247,9 +247,6 @@ const Trading: React.FC = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
-      <Typography variant="h4" gutterBottom>
-        Trading Dashboard
-      </Typography>
       
       <Grid container spacing={3}>
         <Grid item xs={12} md={4}>
