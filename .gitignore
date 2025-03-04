@@ -54,3 +54,4 @@ result
 # Database
 *.db
 *.sqlite3
+.turbo/
