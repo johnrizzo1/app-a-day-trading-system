@@ -1,17 +1,20 @@
 /** @type {import('next').NextConfig} */
 const path = require('path');
 
+// Get the base path from environment variable or default to '/trading'
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '/trading';
+
 const nextConfig = {
   // Disable strict mode to avoid double rendering in development
   reactStrictMode: false,
-  // Set the base path for the app - commented out for now to fix 404 issues
-  // basePath: '/trading',
+  // Set the base path for the app
+  basePath,
   // Rewrite API requests to the API gateway
   async rewrites() {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://api-gateway:8000/:path*',
+        destination: 'http://api:8000/api/:path*',
       },
     ];
   },
