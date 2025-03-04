@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1741104336436" clover="3.2.0">
+  <project timestamp="1741104336436" name="All files">
+    <metrics statements="9" coveredstatements="9" conditionals="0" coveredconditionals="0" methods="7" coveredmethods="7" elements="16" coveredelements="16" complexity="0" loc="9" ncloc="9" packages="2" files="7" classes="7"/>
+    <package name="components">
+      <metrics statements="4" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="2"/>
+      <file name="Layout.tsx" path="/Users/jrizzo/CascadeProjects/windsurf-project/ui/packages/trading/components/Layout.tsx">
+        <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="10" count="1" type="stmt"/>
+        <line num="11" count="1" type="stmt"/>
+      </file>
+      <file name="NavBar.tsx" path="/Users/jrizzo/CascadeProjects/windsurf-project/ui/packages/trading/components/NavBar.tsx">
+        <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="7" type="stmt"/>
+      </file>
+    </package>
+    <package name="pages">
+      <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="5" coveredmethods="5"/>
+      <file name="404.tsx" path="/Users/jrizzo/CascadeProjects/windsurf-project/ui/packages/trading/pages/404.tsx">
+        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="4" count="4" type="stmt"/>
+      </file>
+      <file name="_app.tsx" path="/Users/jrizzo/CascadeProjects/windsurf-project/ui/packages/trading/pages/_app.tsx">
+        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="2" count="1" type="stmt"/>
+      </file>
+      <file name="minimal.js" path="/Users/jrizzo/CascadeProjects/windsurf-project/ui/packages/trading/pages/minimal.js">
+        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="3" count="3" type="stmt"/>
+      </file>
+      <file name="simple.tsx" path="/Users/jrizzo/CascadeProjects/windsurf-project/ui/packages/trading/pages/simple.tsx">
+        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="5" count="3" type="stmt"/>
+      </file>
+      <file name="standalone.js" path="/Users/jrizzo/CascadeProjects/windsurf-project/ui/packages/trading/pages/standalone.js">
+        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="4" count="3" type="stmt"/>
+      </file>
+    </package>
+  </project>
+</coverage>

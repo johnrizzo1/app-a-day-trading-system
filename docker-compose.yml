@@ -1,15 +1,108 @@
 services:
-  ui:
+  # API Gateway
+  gateway:
+    build:
+      context: .
+      dockerfile: services/nginx/Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+      - trading
+      - backtesting
+      - model-development
+      - portfolio-monitor
+      - strategy-development
+    restart: unless-stopped
+
+  # Trading UI
+  trading:
     build:
       context: .
       dockerfile: ui/Dockerfile
-    ports:
-      - "4000:3005"
     environment:
       - NODE_ENV=development
       - NEXT_PUBLIC_API_URL=http://api:8000
+      - PORT=3005
+      - NEXT_PUBLIC_BASE_PATH=/trading
     volumes:
       - ./ui/packages/trading:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Backtesting UI
+  backtesting:
+    build:
+      context: .
+      dockerfile: ui/Dockerfile.backtesting
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://api:8000
+      - PORT=3001
+      - NEXT_PUBLIC_BASE_PATH=/backtesting
+    volumes:
+      - ./ui/packages/backtesting:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Model Development UI
+  model-development:
+    build:
+      context: .
+      dockerfile: ui/Dockerfile.model-development
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://api:8000
+      - PORT=3002
+      - NEXT_PUBLIC_BASE_PATH=/model-development
+    volumes:
+      - ./ui/packages/model-development:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Portfolio Monitor UI
+  portfolio-monitor:
+    build:
+      context: .
+      dockerfile: ui/Dockerfile.portfolio-monitor
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://api:8000
+      - PORT=3003
+      - NEXT_PUBLIC_BASE_PATH=/portfolio-monitor
+    volumes:
+      - ./ui/packages/portfolio-monitor:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Strategy Development UI
+  strategy-development:
+    build:
+      context: .
+      dockerfile: ui/Dockerfile.strategy-development
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://api:8000
+      - PORT=3004
+      - NEXT_PUBLIC_BASE_PATH=/strategy-development
+    volumes:
+      - ./ui/packages/strategy-development:/app
       - /app/node_modules
       - /app/.next
     depends_on:

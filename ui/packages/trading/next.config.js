@@ -2,20 +2,42 @@
 const path = require('path');
 
 const nextConfig = {
-  reactStrictMode: true,
+  // Disable strict mode to avoid double rendering in development
+  reactStrictMode: false,
+  // Set the base path for the app - commented out for now to fix 404 issues
+  // basePath: '/trading',
+  // Rewrite API requests to the API gateway
   async rewrites() {
     return [
       {
         source: '/api/:path*',
-        destination: process.env.NEXT_PUBLIC_API_URL ? `${process.env.NEXT_PUBLIC_API_URL}/api/:path*` : 'http://api:8000/api/:path*',
+        destination: 'http://api-gateway:8000/:path*',
       },
     ];
   },
-  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+  // Configure webpack
+  webpack: (config, { isServer }) => {
+    // Force React and React DOM to be loaded from a single location
     config.resolve.alias = {
       ...config.resolve.alias,
-      shared: path.resolve(__dirname, '../shared'),
+      'react': path.resolve(__dirname, '../../node_modules/react'),
+      'react-dom': path.resolve(__dirname, '../../node_modules/react-dom'),
     };
+
+    // Prevent multiple instances of React
+    config.resolve.modules = [
+      path.resolve(__dirname, '../../node_modules'),
+      'node_modules',
+    ];
+
+    // Remove externals configuration that was causing module not found errors
+    // if (!isServer) {
+    //   config.externals = {
+    //     react: 'React',
+    //     'react-dom': 'ReactDOM',
+    //   };
+    // }
+
     return config;
   },
 };

@@ -1,0 +1,25 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Install Next.js globally
+RUN npm install -g next
+
+# Copy package.json files
+COPY ui/packages/portfolio-monitor/package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the application
+COPY ui/packages/portfolio-monitor/ ./
+
+# Expose the port
+EXPOSE 3003
+
+# Set environment variables
+ENV PORT=3003
+ENV NEXT_PUBLIC_BASE_PATH=/portfolio-monitor
+
+# Start the development server
+CMD ["next", "dev", "-p", "3003"]

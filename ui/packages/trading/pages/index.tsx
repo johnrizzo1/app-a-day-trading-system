@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   Box,
   Card,
@@ -54,21 +54,21 @@ interface SnackbarState {
 }
 
 const Trading: React.FC = () => {
-  const [selectedSymbol, setSelectedSymbol] = useState('');
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [orderType, setOrderType] = useState('market');
-  const [amount, setAmount] = useState('');
-  const [price, setPrice] = useState('');
-  const [contracts, setContracts] = useState<Contract[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [snackbar, setSnackbar] = useState<SnackbarState>({
+  const [contracts, setContracts] = React.useState<Contract[]>([]);
+  const [orders, setOrders] = React.useState<Order[]>([]);
+  const [selectedSymbol, setSelectedSymbol] = React.useState<string>('');
+  const [orderType, setOrderType] = React.useState<string>('Limit');
+  const [amount, setAmount] = React.useState<string>('');
+  const [price, setPrice] = React.useState<string>('');
+  const [loading, setLoading] = React.useState(false);
+  const [snackbar, setSnackbar] = React.useState<SnackbarState>({
     open: false,
     message: '',
     severity: 'success'
   });
 
   // Fetch available contracts when component mounts
-  useEffect(() => {
+  React.useEffect(() => {
     const fetchContracts = async () => {
       try {
         const response = await axios.get('/api/trading/contracts');

@@ -3,6 +3,7 @@ const path = require('path');
 
 const nextConfig = {
   reactStrictMode: true,
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH || '',
   async rewrites() {
     return [
       {
@@ -12,10 +13,15 @@ const nextConfig = {
     ];
   },
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    // Add aliases for shared components
     config.resolve.alias = {
       ...config.resolve.alias,
       shared: path.resolve(__dirname, '../shared'),
+      // Ensure React is loaded from the same place
+      'react': path.resolve(__dirname, 'node_modules/react'),
+      'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
     };
+    
     return config;
   },
 };

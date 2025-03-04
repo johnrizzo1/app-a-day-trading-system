@@ -6,30 +6,35 @@ import {
   Button, 
   Box,
   Container,
-  useTheme
+  createTheme
 } from '@mui/material';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 
 // Define the navigation items
 const navItems = [
-  { name: 'Trading', path: 'http://localhost:3005' },
-  { name: 'Backtesting', path: 'http://localhost:3001' },
-  { name: 'Model Development', path: 'http://localhost:3002' },
-  { name: 'Portfolio Monitor', path: 'http://localhost:3003' },
-  { name: 'Strategy Development', path: 'http://localhost:3004' }
+  { name: 'Trading', path: '/trading' },
+  { name: 'Backtesting', path: '/backtesting' },
+  { name: 'Model Development', path: '/model-development' },
+  { name: 'Portfolio Monitor', path: '/portfolio-monitor' },
+  { name: 'Strategy Development', path: '/strategy-development' }
 ];
 
-const NavBar: React.FC = () => {
-  const theme = useTheme();
-  const router = useRouter();
+// Create a theme instance for use in static methods
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#1976d2',
+      dark: '#115293',
+    },
+  },
+});
 
+const NavBar: React.FC = () => {
   // Helper function to determine if a nav item is active
   const isActive = (path: string) => {
-    // Extract the port from the current URL
-    const currentPort = typeof window !== 'undefined' ? window.location.port : '';
-    const itemPort = path.split(':')[2]?.split('/')[0];
-    return currentPort === itemPort;
+    if (typeof window === 'undefined') return false;
+    const currentPath = window.location.pathname;
+    return currentPath.startsWith(path);
   };
 
   return (

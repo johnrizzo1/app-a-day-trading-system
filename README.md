@@ -1,6 +1,6 @@
-# Multi-Asset Trading System
+# Windsurf - Multi-Asset Trading System
 
-A comprehensive trading system supporting multiple asset classes including Equities, Bonds, and Futures, with real-time market data simulation and automated trading capabilities.
+A comprehensive trading system supporting multiple asset classes including Equities, Bonds, and Futures, with real-time market data simulation and automated trading capabilities. The platform consists of backend microservices and a suite of frontend applications for different trading functions.
 
 ## Features
 
@@ -20,6 +20,18 @@ A comprehensive trading system supporting multiple asset classes including Equit
   - Automated task scheduling
   - Database migrations and versioning
   - Containerized microservices
+
+- **Trading Dashboard**
+  - Real-time order management
+  - Market data visualization
+  - Position tracking
+  - Order history and execution details
+
+- **Advanced Trading Tools**
+  - Backtesting engine for strategy validation
+  - Model development environment
+  - Portfolio monitoring and risk assessment
+  - Strategy development workbench
 
 ## Prerequisites
 
@@ -89,6 +101,8 @@ A comprehensive trading system supporting multiple asset classes including Equit
 
 ### Testing
 
+#### Backend Testing
+
 1. **Unit Tests**
    ```bash
    docker-compose run --rm api pytest tests/unit
@@ -102,6 +116,26 @@ A comprehensive trading system supporting multiple asset classes including Equit
 3. **Coverage Report**
    ```bash
    docker-compose run --rm api pytest --cov=src tests/
+   ```
+
+#### Frontend Testing
+
+1. **Run Tests for Trading Dashboard**
+   ```bash
+   cd ui/packages/trading
+   npm run test
+   ```
+
+2. **Test with Coverage**
+   ```bash
+   cd ui/packages/trading
+   npm run test:coverage
+   ```
+
+3. **Run Tests for All UI Packages**
+   ```bash
+   cd ui
+   npm run test:all
    ```
 
 ### Service Management
@@ -126,6 +160,35 @@ A comprehensive trading system supporting multiple asset classes including Equit
    docker-compose up -d
    ```
 
+### UI Applications
+
+1. **Setup UI Dependencies**
+   ```bash
+   cd ui
+   npm install
+   ```
+
+2. **Run Trading Dashboard**
+   ```bash
+   cd ui/packages/trading
+   npm run dev
+   # Access at http://localhost:3005
+   ```
+
+3. **Run Backtesting Tools**
+   ```bash
+   cd ui/packages/backtesting
+   npm run dev
+   # Access at http://localhost:3001
+   ```
+
+4. **Build for Production**
+   ```bash
+   cd ui/packages/trading
+   npm run build
+   npm run start
+   ```
+
 ## Project Structure
 
 ```
@@ -140,7 +203,14 @@ A comprehensive trading system supporting multiple asset classes including Equit
 │   ├── database/     # Database models
 │   └── utils/        # Shared utilities
 ├── tests/             # Test suite
-└── ui/                # Frontend application
+└── ui/                # Frontend applications
+    ├── packages/      # Monorepo packages
+    │   ├── trading/  # Trading dashboard (port 3005)
+    │   ├── backtesting/ # Backtesting tools (port 3001)
+    │   ├── model-development/ # Model development (port 3002)
+    │   ├── portfolio-monitor/ # Portfolio monitoring (port 3003)
+    │   └── strategy-development/ # Strategy development (port 3004)
+    └── shared/        # Shared components and utilities
 ```
 
 ## API Documentation
