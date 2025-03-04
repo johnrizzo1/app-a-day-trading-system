@@ -35,17 +35,16 @@ interface Contract {
 interface Order {
   id: number;
   contract_id: number;
-  order_type: string;
+  type: string; // API returns 'type' not 'order_type'
   side: string;
   quantity: number;
   price?: number;
   status: string;
   created_at: string;
   updated_at: string;
-  time?: string;
-  symbol?: string;
-  amount?: number;
-  type?: string; // Alias for order_type in the UI
+  account_id: number;
+  instrument_id: number;
+  filled_quantity?: number;
 }
 
 interface SnackbarState {
@@ -102,6 +101,32 @@ const Trading: React.FC = () => {
 
   const handleCloseSnackbar = () => {
     setSnackbar({ ...snackbar, open: false });
+  };
+
+  const handleCancelOrder = async (orderId: number) => {
+    setLoading(true);
+    try {
+      await axios.post(`/api/trading/orders/${orderId}/cancel`);
+      
+      // Refresh orders list
+      const ordersResponse = await axios.get('/api/trading/orders');
+      setOrders(ordersResponse.data);
+      
+      setSnackbar({
+        open: true,
+        message: 'Order cancelled successfully',
+        severity: 'success' as AlertColor
+      });
+    } catch (error) {
+      console.error('Error cancelling order:', error);
+      setSnackbar({
+        open: true,
+        message: `Failed to cancel order: ${error.response?.data?.detail || error.message}`,
+        severity: 'error' as AlertColor
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -352,18 +377,21 @@ const Trading: React.FC = () => {
                 <TableBody>
                   {orders.map((order) => (
                     <TableRow key={order.id}>
-                      <TableCell>{order.time}</TableCell>
-                      <TableCell>{order.symbol}</TableCell>
-                      <TableCell>{order.order_type}</TableCell>
+                      <TableCell>{new Date(order.created_at).toLocaleString()}</TableCell>
+                      <TableCell>
+                        {contracts.find(c => c.id === order.contract_id)?.symbol || order.contract_id}
+                      </TableCell>
+                      <TableCell>{order.type}</TableCell>
                       <TableCell align="right">{order.side}</TableCell>
-                      <TableCell align="right">{order.amount}</TableCell>
-                      <TableCell align="right">{order.price}</TableCell>
+                      <TableCell align="right">{order.quantity}</TableCell>
+                      <TableCell align="right">{order.price || 'Market'}</TableCell>
                       <TableCell align="right">{order.status}</TableCell>
                       <TableCell>
                         <Button
                           size="small"
                           color="error"
-                          onClick={() => {/* Cancel order */}}
+                          onClick={() => handleCancelOrder(order.id)}
+                          disabled={order.status !== 'pending' && order.status !== 'open'}
                         >
                           Cancel
                         </Button>

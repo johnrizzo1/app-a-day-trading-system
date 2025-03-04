@@ -105,6 +105,11 @@ class PositionResponse(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+@router.get("/contracts", response_model=List[ContractResponse])
+async def list_contracts(db: Session = Depends(get_db)):
+    contracts = db.query(FuturesContract).all()
+    return contracts
+
 @router.post("/contracts", response_model=ContractResponse)
 async def create_contract(contract: ContractCreate, db: Session = Depends(get_db)):
     # Check if contract with same symbol already exists

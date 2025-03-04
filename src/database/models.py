@@ -100,7 +100,7 @@ class FuturesContract(Base):
     __tablename__ = "futures_contracts"
     
     id = Column(Integer, primary_key=True)
-    symbol = Column(String, nullable=False)
+    symbol = Column(String, nullable=False, unique=True)
     expiry = Column(DateTime, nullable=False)
     tick_size = Column(Float, nullable=False)
     contract_size = Column(Float, nullable=False)

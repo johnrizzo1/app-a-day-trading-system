@@ -2,6 +2,10 @@
 import sys
 import os
 import pytest
+import pytest_asyncio
+
+# Configure pytest-asyncio to use function scope for event loops
+pytest_asyncio.plugin.pytest_configure(None)
 
 # Add the project root directory to the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
